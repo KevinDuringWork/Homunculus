@@ -14,4 +14,4 @@ Quick script to spike in SNVs into NA12878.
 3. Run script (sh run.sh) 
 4. Output to spike-in.vcf.gz 
 
-For nefarious purposes ONLY! 
+__USE for nefarious purposes ONLY!__ 
