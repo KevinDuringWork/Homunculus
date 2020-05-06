@@ -132,7 +132,7 @@ def write_insert(variant:List[String], a:VariantContext, b:Option[VariantContext
     gt_builder.AD(List(120).toArray)
     gt_builder.attribute("ADALL", "120,120")
     gt_builder.attribute("IGT", variant(3)) 
-    gt_builder.phased(true)
+    //gt_builder.phased(true)
 
     vc_builder.loc(variant(0), variant(1).toLong, variant(1).toLong) 
     vc_builder.alleles(alleles)
