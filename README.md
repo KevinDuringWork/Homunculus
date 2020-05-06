@@ -9,7 +9,7 @@ Quick script to spike in SNVs into NA12878.
     * Will download NA12878 (vcf) + index (128MB) 
 
 2. Edit input (spike-in.csv) 
-    * Indicides are CHROM, POS, ALT, GT (0/1, 1/1) 
+    * Indicies are CHROM, POS, ALT, GT (0/1, 1/1) 
 
 3. Run script (sh run.sh) 
 4. Output to spike-in.vcf.gz 
