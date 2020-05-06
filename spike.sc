@@ -127,7 +127,6 @@ def write_insert(variant:List[String], a:VariantContext, b:Option[VariantContext
     println("\n ----- DEBUG (constructed spike) ----- ")
 
     gt_builder.alleles(alleles) 
-    gt_builder.passFilters() 
     gt_builder.GQ(700)
     gt_builder.DP(500)
     gt_builder.AD(List(120).toArray)
@@ -138,6 +137,7 @@ def write_insert(variant:List[String], a:VariantContext, b:Option[VariantContext
     vc_builder.loc(variant(0), variant(1).toLong, variant(1).toLong) 
     vc_builder.alleles(alleles)
     vc_builder.genotypes(List(gt_builder.make).asJava)  
+    vc_builder.passFilters() 
     println(vc_builder.make)
     println("") 
 
