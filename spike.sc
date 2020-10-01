@@ -50,7 +50,7 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
     spike_in.close()
 
     // Read Assembly
-    val assmbly = new IndexedFastaSequenceFile(
+    val assembly = new IndexedFastaSequenceFile(
         new File(s"${ref}.reference.fa"),
         new FastaSequenceIndex(
             new File(s"${ref}.reference.fa.fai")
@@ -101,7 +101,7 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
 
     def write_insert(variant:List[String], a:VariantContext, b:Option[VariantContext], action:String): Unit = {
         
-        val ref = GRCh37.getSubsequenceAt(s"chr${variant(0)}", variant(1).toInt, variant(1).toInt).getBaseString()
+        val ref = assembly.getSubsequenceAt(s"chr${variant(0)}", variant(1).toInt, variant(1).toInt).getBaseString()
         println(s"[[ SPIKE ]] >> \n")
         println(s"CHROM:${variant(0)} POS:${variant(1)} REF:${ref} ALT:${variant(2)} GT:${variant(3)}")
         
