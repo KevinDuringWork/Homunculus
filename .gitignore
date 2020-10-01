@@ -1,3 +1,9 @@
+*.fai
+*.fa
+*.tbi
+*.gz
 *.vscode
 *.metals
+
+amm
 test.sc
