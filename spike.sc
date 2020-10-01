@@ -35,8 +35,8 @@ import $ivy.`com.github.samtools:htsjdk:2.21.3`,
     htsjdk.variant.vcf.VCFHeader
 
 @main 
-def main(ref:String @doc("GRCH37 or GRCH38")) = {
-    val output = new java.io.File(s"spike-in-${ref}.vcf.gz")
+def main(asm:String @doc("GRCH37 or GRCH38")) = {
+    val output = new java.io.File(s"spike-in-${asm}.vcf.gz")
     if (output.exists) output.delete 
 
     // Read SPIKE  
@@ -44,7 +44,7 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
     val spike_in_map = spike_in.all()
         .foldLeft(Map.empty[(String, String), List[String]]) {
             (acc, v) => acc ++ Map(
-                ((ref match {
+                ((asm match {
                     case "GRCH38" => s"chr${v(0).trim}"
                     case _ => v(0).trim
                 },     
@@ -55,15 +55,15 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
 
     // Read Assembly
     val assembly = new IndexedFastaSequenceFile(
-        new File(s"${ref}.genome.fa"),
+        new File(s"${asm}.genome.fa"),
         new FastaSequenceIndex(
-            new File(s"${ref}.genome.fa.fai")
+            new File(s"${asm}.genome.fa.fai")
         )
     )
     
     // Read NA12878 
     val vcf_reader = AbstractFeatureReader.getFeatureReader(
-    (new File(s"NA12878.${ref}.vcf.gz")).getAbsolutePath(), new VCFCodec(), true)
+    (new File(s"NA12878.${asm}.vcf.gz")).getAbsolutePath(), new VCFCodec(), true)
 
     // Write w/ Spike-in 
     val vcf_writer = new VariantContextWriterBuilder()
@@ -104,7 +104,10 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
     }
 
     def write_insert(variant:List[String], a:VariantContext, b:Option[VariantContext], action:String): Unit = {
-        
+        val prefix = asm match {
+            case "GRCH38" => "chr"
+            case _ => ""
+        }
         val ref = assembly.getSubsequenceAt(s"chr${variant(0)}", variant(1).toInt, variant(1).toInt).getBaseString()
         
         println(s"[[ SPIKE ]] >> \n")
@@ -140,7 +143,7 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
         gt_builder.attribute("IGT", variant(3)) 
         //gt_builder.phased(true)
 
-        vc_builder.loc(variant(0), variant(1).toLong, variant(1).toLong) 
+        vc_builder.loc(s"${prefix}${variant(0)}", variant(1).toLong, variant(1).toLong) 
         vc_builder.alleles(alleles)
         vc_builder.genotypes(List(gt_builder.make).asJava)  
         vc_builder.passFilters() 
@@ -156,7 +159,7 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
         
         val curr:VariantContext  = variants(0)
         val next:VariantContext  = variants(1)
-        var prefix = ref match {
+        val prefix = asm match {
             case "GRCH38" => ""
             case _ => "chr"
         }
