@@ -210,10 +210,7 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
         }
     }
     vcf_reader.close()
-    vcf_writer.close() 
-
-
-
+    vcf_writer.close()
 }
 
 
