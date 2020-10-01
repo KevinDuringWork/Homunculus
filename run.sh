@@ -1,3 +1,2 @@
 #/bin/bash 
-
-./amm spike.sc
+./amm spike.sc $1
