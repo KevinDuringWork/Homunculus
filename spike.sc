@@ -44,16 +44,20 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
     val spike_in_map = spike_in.all()
         .foldLeft(Map.empty[(String, String), List[String]]) {
             (acc, v) => acc ++ Map(
-                ((v(0).trim, v(1).trim), v.map(_.trim))
+                ((ref match {
+                    case "GRCH38" => s"chr${v(0).trim}"
+                    case _ => v(0).trim
+                },     
+                v(1).trim), v.map(_.trim))
             )
         }
     spike_in.close()
 
     // Read Assembly
     val assembly = new IndexedFastaSequenceFile(
-        new File(s"${ref}.reference.fa"),
+        new File(s"${ref}.genome.fa"),
         new FastaSequenceIndex(
-            new File(s"${ref}.reference.fa.fai")
+            new File(s"${ref}.genome.fa.fai")
         )
     )
     
@@ -102,6 +106,7 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
     def write_insert(variant:List[String], a:VariantContext, b:Option[VariantContext], action:String): Unit = {
         
         val ref = assembly.getSubsequenceAt(s"chr${variant(0)}", variant(1).toInt, variant(1).toInt).getBaseString()
+        
         println(s"[[ SPIKE ]] >> \n")
         println(s"CHROM:${variant(0)} POS:${variant(1)} REF:${ref} ALT:${variant(2)} GT:${variant(3)}")
         
@@ -151,11 +156,15 @@ def main(ref:String @doc("GRCH37 or GRCH38")) = {
         
         val curr:VariantContext  = variants(0)
         val next:VariantContext  = variants(1)
+        var prefix = ref match {
+            case "GRCH38" => ""
+            case _ => "chr"
+        }
 
         (curr, next, index) match {
 
             case (curr, next, _) if (curr.getContig != next.getContig) => {
-                println(s"Searching: (chr${next.getContig})")
+                println(s"Searching: (${prefix}${next.getContig})")
                 
                 // write curr 
                 vcf_writer.add(curr)
