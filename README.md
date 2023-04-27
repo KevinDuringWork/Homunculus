@@ -1,6 +1,6 @@
 # Homunculus
 
-Quick script to spike in SNVs into NA12878. 
+Quick script to spike in SNVs into NA12878 with just Scala. 
 
 1. Get project (git clone https://github.com/KevinDuringWork/Homunculus.git) 
 
@@ -14,7 +14,7 @@ Quick script to spike in SNVs into NA12878.
     * Indicies are CHROM, POS, ALT, GT (0/1 or 1/1) 
 
 3. Run script 
-    * sh run.sh GRCh38 
+    * sh run.sh 
 
 4. Output to spike-in.GRCh38.vcf.gz 
 

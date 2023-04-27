@@ -69,7 +69,7 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile,
                     (b._2.toInt) < a.getStart
                 }.toMap
             
-        case "after" => 
+            case "after" => 
                 spike_in_map.view.filterKeys{
                     case af => (af._1 == a.getContig) && 
                     (af._2.toInt) > a.getStart
@@ -120,7 +120,6 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile,
         println(a)
 
         println("\n ----- DEBUG (constructed spike) ----- ")
-
         gt_builder.alleles(alleles) 
         gt_builder.GQ(700)
         gt_builder.DP(500)
@@ -131,6 +130,7 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile,
         vc_builder.alleles(alleles)
         vc_builder.genotypes(List(gt_builder.make).asJava)  
         vc_builder.passFilters() 
+
         println(vc_builder.make)
         println("") 
 
