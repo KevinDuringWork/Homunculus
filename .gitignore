@@ -1,3 +1,5 @@
+.bsp/
+.scala-build/
 *.fai
 *.fa
 *.tbi
@@ -5,5 +7,3 @@
 *.vscode
 *.metals
 
-amm
-test.sc

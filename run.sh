@@ -1,2 +1,2 @@
 #/bin/bash 
-./amm spike.sc $1
+scala-cli spike.sc
