@@ -2,6 +2,21 @@
 
 Quick script to spike in SNVs into NA12878 with just Scala. 
 
+Equivalent to bcftools commands, but using htsjdk. 
+Manual editting of VCF introduces syntax errors easily.
+
+Example: 
+```
+# Generate a template  
+bcftools view -h NA12878.GRCh38.vcf.gz > header.vcf
+bcftools view --no-header NA12878.GRCh38.vcf.gz | head -1 >> header.vcf
+cp header.vcf AR1.vcf
+
+# (.. manually .. edit fields AR1.vcf)
+bgzip AR1.vcf && tabix AR1.vcf.gz 
+bcftools concat -a -o AR1.merged.vcf.gz -O z NA12878.GRCh38.vcf.gz AR1.vcf.gz
+```
+
 1. Get project (git clone https://github.com/KevinDuringWork/Homunculus.git) 
 
 2. Run scala-cli: https://scala-cli.virtuslab.org/install/ 
