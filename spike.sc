@@ -3,10 +3,13 @@
 //> using lib "com.github.samtools:htsjdk:3.0.4"
 //> using lib "com.github.tototoshi::scala-csv:1.3.10"
 //
+import scala.language.postfixOps
 import scala.util.control.Breaks._
 import cats.implicits._
 import com.github.tototoshi.csv.CSVReader
-
+import java.io.File 
+import java.net.URL
+import sys.process._ 
 import scala.jdk.CollectionConverters._
 import java.io.{File, InputStreamReader, FileInputStream}
 import htsjdk.samtools.reference.IndexedFastaSequenceFile, 
@@ -20,7 +23,30 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile,
     htsjdk.variant.variantcontext.writer.VariantContextWriterBuilder,
     htsjdk.variant.vcf.VCFCodec,
     htsjdk.variant.vcf.VCFHeader
-    
+    /*
+    val assemble = (
+      "http://bioinfo.hpc.cam.ac.uk/downloads/datasets/fasta/grch38/reference_genome.fa",
+      "http://bioinfo.hpc.cam.ac.uk/downloads/datasets/fasta/grch38/reference_genome.fa.fai"
+    )
+
+    val NA12878 = (
+      "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/NA12878_HG001/latest/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz",
+      "https://ftp-trace.ncbi.nlm.nih.gov/ReferenceSamples/giab/release/NA12878_HG001/latest/GRCh38/HG001_GRCh38_1_22_v4.2.1_benchmark.vcf.gz.tbi"
+    )
+
+    if (!(new File("GRCh38.genome.fa")).exists()) {
+      println("Downloading Assembly")  
+      new URL(assemble._1) #> new File("GRCh38.genome.fa") !!
+      new URL(assemble._2) #> new File("GRCh38.genome.fa.fai") !!
+    }
+
+    if (!(new File("NA12878.GRCh38.vcf.gz")).exists()) {
+      println("Downloading NA12878")
+      new URL(NA12878._1) #> new File("NA12878.GRCh38.vcf.gz") !! 
+      new URL(NA12878._2) #> new File("NA12878.GRCh38.vcf.gz.tbi") !!
+    }
+    */
+
     val asm = "GRCh38"
     val output = new java.io.File(s"spike-in-${asm}.vcf.gz")
     if (output.exists) output.delete 
@@ -110,28 +136,33 @@ import htsjdk.samtools.reference.IndexedFastaSequenceFile,
         // - Construct Genotype 
 
         val vc_builder = new VariantContextBuilder(a)
-        val gt_builder = new GenotypeBuilder(a.getGenotype(0))
+        val ref_alt = List(Allele.create(ref, true),  Allele.create(variant(2))).asJava
         val alleles = variant(3) match {
             case "1/1"     => List(Allele.create(variant(2)), Allele.create(variant(2))).asJava 
-            case "0/1" | _ => List(Allele.create(ref, true), Allele.create(variant(2))).asJava       
+            case "0/1" | _ => ref_alt       
         }
         
         println("\n ----- DEBUG (template for spike)  ------") 
         println(a)
 
+        println("\n ----- DEBUG Alleles  ------")
+        println(alleles)
+
+
         println("\n ----- DEBUG (constructed spike) ----- ")
-        gt_builder.alleles(alleles) 
+        val gt_builder = new GenotypeBuilder("HG001", alleles) 
         gt_builder.GQ(700)
         gt_builder.DP(500)
         gt_builder.AD(List(120).toArray)
         gt_builder.attribute("ADALL", "120,120")
 
         vc_builder.loc(s"${prefix}${variant(0)}", variant(1).toLong, variant(1).toLong) 
-        vc_builder.alleles(alleles)
+        vc_builder.alleles(ref_alt)
         vc_builder.genotypes(List(gt_builder.make).asJava)  
         vc_builder.passFilters() 
 
         println(vc_builder.make)
+        println(vc_builder.getGenotypes())
         println("") 
 
         vcf_writer.add(vc_builder.make) 
